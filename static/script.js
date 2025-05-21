@@ -24,10 +24,16 @@ async function speak(text) {
             if (currentAudio) currentAudio.pause();
             currentAudio = new Audio(data.audio);
             currentAudio.play();
-            currentAudio.onended = () => setOrbState("idle");
+            currentAudio.onended = () => {
+                setOrbState("idle");
+                startListening();
+            };
         } else {
             setOrbState("speaking");
-            setTimeout(() => setOrbState("idle"), 3000);
+            setTimeout(() => {
+                setOrbState("idle");
+                startListening();
+            }, 3000);
         }
     } catch (err) {
         console.error("Error:", err);
@@ -87,8 +93,8 @@ if (askButton && userInput) {
 async function loadMilestones() {
     const res = await fetch("/timeline");
     const data = await res.json();
-    const list = document.getElementById("milestone-list");
-    if (data && data.timeline && data.timeline.length) {
+    const list = document.getElementById("milstone-list");
+    if (data && data.timeline?.length) {
         list.innerHTML = data.timeline.map(m => `<div>📅 ${m.date}: ${m.event}</div>`).join("");
     } else {
         list.innerHTML = "<div>No milestones recorded yet.</div>";
@@ -164,7 +170,6 @@ function showCTA(tier) {
     ctaButton.onclick = () => window.open(url, "_blank");
     ctaButton.style.display = "inline-block";
 }
-
 
 const emailInput = document.getElementById("email-input");
 const emailButton = document.getElementById("email-submit-button");
