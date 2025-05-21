@@ -2,6 +2,7 @@ const orb = document.getElementById("orb");
 const subtitleBox = document.getElementById("subtitles");
 const stopButton = document.getElementById("stop-button");
 let currentAudio = null;
+let recognition;
 
 function setOrbState(state) {
     if (!orb) return;
@@ -24,10 +25,16 @@ async function speak(text) {
             if (currentAudio) currentAudio.pause();
             currentAudio = new Audio(data.audio);
             currentAudio.play();
-            currentAudio.onended = () => setOrbState("idle");
+            currentAudio.onended = () => {
+                setOrbState("idle");
+                startListening(); // Auto loop
+            };
         } else {
             setOrbState("speaking");
-            setTimeout(() => setOrbState("idle"), 3000);
+            setTimeout(() => {
+                setOrbState("idle");
+                startListening(); // Auto loop fallback
+            }, 3000);
         }
     } catch (err) {
         console.error("Error:", err);
@@ -35,15 +42,35 @@ async function speak(text) {
     }
 }
 
+function startListening() {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) return;
+    if (recognition) recognition.abort();
+
+    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => setOrbState("listening");
+    recognition.onerror = (e) => console.error("Speech error:", e);
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById("user-input").value = transcript;
+        document.getElementById("ask-lumina").click();
+    };
+
+    recognition.start();
+}
+
 stopButton.addEventListener("click", () => {
     if (currentAudio) {
         currentAudio.pause();
         currentAudio = null;
     }
+    if (recognition) recognition.abort();
     subtitleBox.textContent = "";
     setOrbState("idle");
 });
-
 const heyLuminaBtn = document.getElementById("hey-lumina-button");
 if (heyLuminaBtn) {
     heyLuminaBtn.addEventListener("click", () => {
@@ -164,7 +191,6 @@ function showCTA(tier) {
     ctaButton.onclick = () => window.open(url, "_blank");
     ctaButton.style.display = "inline-block";
 }
-
 
 const emailInput = document.getElementById("email-input");
 const emailButton = document.getElementById("email-submit-button");
