@@ -52,8 +52,11 @@ stopButton.addEventListener("click", () => {
 
 const heyLuminaBtn = document.getElementById("hey-lumina-button");
 if (heyLuminaBtn) {
-    heyLuminaBtn.addEventListener("click", () => {
-        speak("Welcome to Lumina Legacy. I am your AI assistant.");
+    heyLuminaBtn.addEventListener("click", async () => {
+        await speak("Let me ask a few quick questions to match you to the right tier...");
+        setTimeout(() => {
+            speak("Do you already have a business, or are you just getting started?");
+        }, 3500);
     });
 }
 
