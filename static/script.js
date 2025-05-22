@@ -105,4 +105,31 @@ if (askButton && userInput) {
         }
     });
 
-    userInput.add
+    userInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            askButton.click();
+        }
+    });
+}
+
+function showCTA(tier) {
+    const ctaButton = document.getElementById("cta-button");
+    let text = "", url = "";
+    if (tier === "spark") {
+        text = "Get Started with Lumina Spark ($297)";
+        url = "https://buy.stripe.com/test_00wfZacRcgHV1SA0W2awo00";
+    } else if (tier === "ignite") {
+        text = "Book Lumina Ignite ($997)";
+        url = "https://buy.stripe.com/test_cNi7sE3gC1N1eFm6gmawo01";
+    } else if (tier === "sovereign") {
+        text = "Launch with Lumina Sovereign ($2222)";
+        url = "https://buy.stripe.com/test_eVqeV68AWgHV0OwcEKawo02";
+    } else {
+        ctaButton.style.display = "none";
+        return;
+    }
+    ctaButton.textContent = text;
+    ctaButton.onclick = () => window.open(url, "_blank");
+    ctaButton.style.display = "inline-block";
+}
