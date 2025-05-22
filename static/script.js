@@ -114,7 +114,23 @@ if (askButton && userInput) {
 }
 
 function showCTA(tier) {
-    const ctaButton = document.getElementById("cta-button");
+    let ctaButton = document.getElementById("cta-button");
+
+    // Auto-create if missing
+    if (!ctaButton) {
+        ctaButton = document.createElement("button");
+        ctaButton.id = "cta-button";
+        ctaButton.style.marginTop = "16px";
+        ctaButton.style.padding = "10px 20px";
+        ctaButton.style.borderRadius = "8px";
+        ctaButton.style.border = "none";
+        ctaButton.style.background = "#8F00FF";
+        ctaButton.style.color = "#fff";
+        ctaButton.style.fontSize = "16px";
+        ctaButton.style.cursor = "pointer";
+        subtitleBox?.parentNode?.appendChild(ctaButton);
+    }
+
     let text = "", url = "";
     if (tier === "spark") {
         text = "Get Started with Lumina Spark ($297)";
@@ -129,6 +145,7 @@ function showCTA(tier) {
         ctaButton.style.display = "none";
         return;
     }
+
     ctaButton.textContent = text;
     ctaButton.onclick = () => window.open(url, "_blank");
     ctaButton.style.display = "inline-block";
